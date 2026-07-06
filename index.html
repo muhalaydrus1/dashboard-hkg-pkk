@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Registrasi HKG PKK Ke-54</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --g-tua:#00796B;--g-mid:#00897B;--emas:#00A99D;--emas-l:#80CBC4;
+      --krem:#F5FFFD;--putih:#FFFFFF;--gelap:#0D1F1E;
+      --mid:#4A7B76;--terang:#E0F2F1;--border:rgba(0,121,107,0.12);
+      --sw:240px;
+      --H-bg:#D1FAE5;--H-tx:#065F46;--H-bd:#6EE7B7;
+      --M-bg:#FEE2E2;--M-tx:#991B1B;--M-bd:#FCA5A5;
+      --K-bg:#FEF9C3;--K-tx:#854D0E;--K-bd:#FDE047;
+      --tbl-fs: 0.95rem;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--krem);color:var(--gelap);display:flex;min-height:100vh;}
+
+    /* ══ SIDEBAR ══ */
+    #sidebar{width:var(--sw);background:var(--g-tua);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .25s ease;overflow-y:auto;}
+    .sb-logo{padding:1.25rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);}
+    .sb-badge{width:40px;height:40px;background:var(--emas);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:var(--g-tua);margin-bottom:.6rem;}
+    .sb-title{font-size:.82rem;font-weight:700;color:var(--putih);line-height:1.3;}
+    .sb-sub{font-size:.65rem;color:var(--emas-l);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-top:.2rem;}
+    .sb-sec{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);padding:.9rem 1.25rem .35rem;}
+    nav a{display:flex;align-items:center;gap:.6rem;padding:.55rem 1.25rem;font-size:.79rem;font-weight:500;color:rgba(255,255,255,.65);text-decoration:none;border-left:3px solid transparent;transition:all .15s;}
+    nav a:hover{color:var(--putih);background:rgba(255,255,255,.06);}
+    nav a.active{color:var(--emas-l);background:rgba(200,151,58,.12);border-left-color:var(--emas);font-weight:600;}
+    .nav-icon{font-size:.85rem;flex-shrink:0;}
+    .sb-foot{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.08);}
+    .s-pill{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.5rem .75rem;}
+    .s-dot{width:7px;height:7px;border-radius:50%;background:#4ADE80;animation:pulse 2s infinite;flex-shrink:0;}
+    .s-dot.loading{background:var(--emas-l);animation:blink 1s infinite;}
+    .s-dot.error{background:#F87171;animation:none;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .s-info{display:flex;flex-direction:column;}
+    .s-txt{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.8);font-family:'DM Mono',monospace;}
+    .s-time{font-size:.62rem;color:rgba(255,255,255,.35);font-family:'DM Mono',monospace;margin-top:1px;}
+
+    /* ══ MAIN ══ */
+    #main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+    /* ══ TOPBAR ══ */
+    #topbar{background:var(--putih);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .tb-title{font-size:.9rem;font-weight:700;color:var(--g-tua);display:flex;align-items:center;gap:.5rem;}
+    .tb-title span{color:var(--mid);font-weight:400;font-size:.8rem;}
+    .btn-ref{background:var(--g-tua);color:var(--putih);border:none;border-radius:7px;padding:.4rem .9rem;font-size:.75rem;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background .15s;}
+    .btn-ref:hover{background:var(--g-mid);}
+    .btn-ref:disabled{opacity:.5;cursor:not-allowed;}
+
+    /* ══ PAGES ══ */
+    .page{display:none;padding:1.75rem 2rem;flex-direction:column;gap:1.5rem;}
+    .page.active{display:flex;}
+
+    /* ══════════════════════════════════════
+       HERO SUMMARY — 3D style
+    ══════════════════════════════════════ */
+    .hero-summary {
+      background: linear-gradient(135deg, #00695C 0%, #00897B 60%, #00BCD4 100%);
+      border-radius: 20px;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 20px 60px rgba(27,67,50,0.35),
+        0 8px 20px rgba(27,67,50,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .hero-summary::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero-summary::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(200,151,58,0.08);
+    }
+    .hero-eyebrow {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--emas-l);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      opacity: .9;
+    }
+    .hero-number {
+      font-size: clamp(4rem, 10vw, 7rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      /* 3D text effect */
+      color: #FFFFFF;
+      text-shadow:
+        0 1px 0 #ccc,
+        0 2px 0 #c9c9c9,
+        0 3px 0 #bbb,
+        0 4px 0 #b9b9b9,
+        0 5px 0 #aaa,
+        0 6px 1px rgba(0,0,0,.1),
+        0 0 5px rgba(0,0,0,.1),
+        0 1px 3px rgba(0,0,0,.3),
+        0 3px 5px rgba(0,0,0,.2),
+        0 5px 10px rgba(0,0,0,.25),
+        0 10px 10px rgba(0,0,0,.2),
+        0 20px 20px rgba(0,0,0,.15);
+      margin-bottom: .5rem;
+      position: relative; z-index: 1;
+      font-family: 'DM Mono', monospace;
+    }
+    .hero-label {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 1.5rem;
+      position: relative; z-index: 1;
+      letter-spacing: .01em;
+    }
+    .hero-pct-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      padding: .6rem 1.5rem;
+      position: relative; z-index: 1;
+      backdrop-filter: blur(4px);
+    }
+    .hero-pct-label {
+      font-size: .82rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+    .hero-pct-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: -0.02em;
+      /* 3D text smaller */
+      color: var(--emas-l);
+      text-shadow:
+        0 1px 0 rgba(0,0,0,.3),
+        0 2px 4px rgba(0,0,0,.2),
+        0 4px 8px rgba(0,0,0,.15);
+    }
+    .hero-loading {
+      color: rgba(255,255,255,0.4);
+      font-family: 'DM Mono', monospace;
+      font-size: 2rem;
+      animation: blink 1s infinite;
+    }
+
+    /* ══ LEGEND ══ */
+    .legend{display:flex;align-items:center;gap:1rem;background:var(--putih);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem;width:fit-content;flex-wrap:wrap;}
+    .leg-lbl{font-size:.75rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.05em;}
+    .leg-item{display:flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:500;}
+    .leg-dot{width:10px;height:10px;border-radius:3px;}
+    .ld-H{background:var(--H-bg);border:1.5px solid var(--H-bd);}
+    .ld-M{background:var(--M-bg);border:1.5px solid var(--M-bd);}
+    .ld-K{background:var(--K-bg);border:1.5px solid var(--K-bd);}
+
+    /* ══ CARD ══ */
+    .card{background:var(--putih);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+    .card-hdr{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);background:rgba(27,67,50,.02);}
+    .card-ttl-row{display:flex;align-items:center;gap:.55rem;}
+    .card-pip{width:4px;height:18px;border-radius:2px;background:var(--emas);}
+    .card-ttl{font-size:.88rem;font-weight:700;color:var(--g-tua);text-transform:uppercase;letter-spacing:.05em;}
+
+    /* ══ TABLE ══ */
+    .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{width:100%;border-collapse:collapse;font-size:var(--tbl-fs);}
+    thead th{background:var(--g-tua);color:var(--putih);padding:.7rem 1rem;text-align:center;font-size:calc(var(--tbl-fs) - 0.05rem);font-weight:600;letter-spacing:.03em;white-space:nowrap;}
+    thead th:first-child{text-align:left;}
+    tbody td{padding:.55rem 1rem;border-bottom:1px solid var(--terang);vertical-align:middle;text-align:center;}
+    tbody td:first-child{text-align:left;}
+    tbody tr:last-child td{border-bottom:none;}
+    tbody tr:hover td{filter:brightness(.96);}
+
+    /* numeric = center (already default), text first col = left (already default) */
+    td.num{font-family:'DM Mono',monospace;font-weight:500;text-align:center;}
+
+    /* cell status */
+    td.c-H{background:var(--H-bg);color:var(--H-tx);}
+    td.c-M{background:var(--M-bg);color:var(--M-tx);}
+    td.c-K{background:var(--K-bg);color:var(--K-tx);}
+
+    tr.row-total td{font-weight:700;background:rgba(27,67,50,.07)!important;color:var(--g-tua);}
+    tr.row-prov td{font-weight:700;background:rgba(27,67,50,.04)!important;color:var(--g-tua);}
+    tr.row-tidak-hadir td{background:#1a1a1a!important;color:#ffffff!important;font-style:italic;font-weight:500;}
+    tr.row-tidak-hadir td.num{color:#ffffff!important;}
+
+    /* ══ STATE ══ */
+    .state-box{padding:3rem 2rem;text-align:center;color:var(--mid);}
+    .spinner{width:28px;height:28px;border:3px solid var(--terang);border-top-color:var(--g-mid);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto .75rem;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .state-box p{font-size:.88rem;line-height:1.6;}
+    .state-box.err{color:#DC2626;}
+
+    footer{text-align:center;padding:1.25rem 2rem;font-size:.72rem;color:var(--mid);border-top:1px solid var(--border);margin-top:auto;}
+    footer b{color:var(--g-tua);}
+
+    .burger{display:none;background:none;border:none;cursor:pointer;padding:.25rem;color:var(--g-tua);font-size:1.3rem;line-height:1;}
+    #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;}
+
+    /* ══ PROVINCE PAGE ══ */
+    .prov-page-wrap { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* Search bar */
+    .prov-search-wrap {
+      display: flex; align-items: center; gap: .75rem;
+      background: var(--putih); border: 1.5px solid var(--border);
+      border-radius: 12px; padding: .6rem 1rem;
+      box-shadow: 0 1px 4px rgba(0,121,107,.06);
+      transition: border-color .2s;
+    }
+    .prov-search-wrap:focus-within { border-color: var(--emas); }
+    .prov-search-icon { color: var(--mid); font-size: 1rem; flex-shrink: 0; }
+    .prov-search-wrap input {
+      border: none; outline: none; width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .9rem; color: var(--gelap); background: transparent;
+    }
+    .prov-search-wrap input::placeholder { color: var(--mid); }
+
+    /* Grid */
+    .prov-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    /* Card */
+    .prov-card {
+      background: var(--putih);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem .9rem;
+      cursor: pointer;
+      transition: all .2s cubic-bezier(.34,1.56,.64,1);
+      display: flex; flex-direction: column; align-items: center;
+      gap: .6rem; text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,121,107,.05);
+    }
+    .prov-card::before {
+      content: ''; position: absolute;
+      inset: 0; background: linear-gradient(135deg, rgba(0,169,157,.06) 0%, transparent 100%);
+      opacity: 0; transition: opacity .2s;
+    }
+    .prov-card:hover { transform: translateY(-4px) scale(1.02); border-color: var(--emas); box-shadow: 0 8px 24px rgba(0,169,157,.18); }
+    .prov-card:hover::before { opacity: 1; }
+    .prov-card.active-card { border-color: var(--emas); background: linear-gradient(135deg, rgba(0,169,157,.08), var(--putih)); box-shadow: 0 4px 16px rgba(0,169,157,.2); }
+    .prov-card.hidden { display: none; }
+
+    .prov-card-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--emas), var(--g-mid));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 10px rgba(0,169,157,.25);
+      transition: transform .2s;
+    }
+    .prov-card:hover .prov-card-icon { transform: scale(1.1) rotate(-3deg); }
+    .prov-card-name {
+      font-size: .78rem; font-weight: 700;
+      color: var(--g-tua); line-height: 1.3;
+      letter-spacing: .01em;
+    }
+    .prov-card-hint {
+      font-size: .67rem; color: var(--mid);
+      line-height: 1.4;
+    }
+    .prov-card-badge {
+      position: absolute; top: .5rem; right: .5rem;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--emas); opacity: 0;
+      transition: opacity .2s;
+    }
+    .prov-card.active-card .prov-card-badge { opacity: 1; }
+
+    /* No results */
+    .prov-empty-search {
+      grid-column: 1/-1; padding: 2rem; text-align: center; color: var(--mid);
+      font-size: .85rem;
+    }
+
+    /* Data panel */
+    .prov-data-panel {
+      background: var(--putih);
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,121,107,.06);
+      display: none;
+    }
+    .prov-data-panel.show { display: block; }
+
+    .prov-data-header {
+      background: linear-gradient(135deg, var(--g-tua), var(--g-mid));
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    }
+    .prov-breadcrumb {
+      font-size: .68rem; color: rgba(255,255,255,.55);
+      font-weight: 500; margin-bottom: .35rem;
+      letter-spacing: .03em;
+    }
+    .prov-breadcrumb span { color: rgba(255,255,255,.85); }
+    .prov-data-title {
+      font-size: 1.25rem; font-weight: 800;
+      color: var(--putih); letter-spacing: -.01em;
+    }
+    .prov-data-title small {
+      display: block; font-size: .72rem;
+      color: rgba(255,255,255,.55); font-weight: 400;
+      margin-top: .2rem;
+    }
+    .prov-nav-btns { display: flex; gap: .5rem; flex-shrink: 0; margin-top: .25rem; }
+    .prov-nav-btn {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: var(--putih); border-radius: 8px;
+      padding: .4rem .75rem; font-size: .72rem; font-weight: 600;
+      cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background .15s; white-space: nowrap;
+    }
+    .prov-nav-btn:hover { background: rgba(255,255,255,.22); }
+    .prov-nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    .prov-data-body { overflow-x: auto; }
+
+    /* Loading spinner for province */
+    .prov-loading {
+      padding: 3rem 2rem; text-align: center; color: var(--mid);
+    }
+    .prov-loading .spinner { margin: 0 auto .75rem; }
+    .prov-loading p { font-size: .85rem; }
+
+    /* Empty state */
+    .prov-empty-state {
+      padding: 3rem 2rem; text-align: center;
+    }
+    .prov-empty-icon { font-size: 3rem; margin-bottom: .75rem; }
+    .prov-empty-state h3 { font-size: 1rem; font-weight: 700; color: var(--g-tua); margin-bottom: .4rem; }
+    .prov-empty-state p { font-size: .82rem; color: var(--mid); line-height: 1.6; }
+
+    /* Welcome state */
+    .prov-welcome {
+      padding: 3rem 2rem; text-align: center;
+    }
+    .prov-welcome-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .prov-welcome h3 { font-size: 1.1rem; font-weight: 700; color: var(--g-tua); margin-bottom: .5rem; }
+    .prov-welcome p { font-size: .85rem; color: var(--mid); line-height: 1.7; max-width: 360px; margin: 0 auto; }
+
+    @media (max-width: 640px) {
+      .prov-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .75rem; }
+      .prov-data-header { flex-direction: column; }
+      .prov-nav-btns { width: 100%; }
+      .prov-nav-btn { flex: 1; text-align: center; }
+    }
+
+    /* PDF Button */
+    .btn-pdf {
+      background: var(--emas); color: var(--g-tua);
+      border: none; border-radius: 7px;
+      padding: .4rem .9rem; font-size: .75rem; font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; gap: .35rem;
+    }
+    .btn-pdf:hover { background: #00897B; color: #fff; }
+    .btn-pdf:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* PDF capture area */
+    .pdf-capture {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 0;
+    }
+    .pdf-title-block {
+      margin-bottom: 1rem;
+      padding-bottom: .75rem;
+      border-bottom: 2px solid var(--g-tua);
+    }
+    .pdf-title-block h2 {
+      font-size: 1rem; font-weight: 800;
+      color: var(--g-tua); margin-bottom: .25rem;
+    }
+    .pdf-title-block p {
+      font-size: .7rem; color: var(--mid);
+    }
+    .pdf-legend {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1rem; flex-wrap: wrap;
+      font-size: .72rem;
+    }
+    .pdf-legend-title { font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: .05em; }
+    .pdf-legend-item { display: flex; align-items: center; gap: .3rem; font-weight: 500; }
+    .pdf-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+    @media print { .btn-pdf { display: none !important; } }
+
+        /* ══ PDF / PRINT ══ */
+    .btn-pdf {
+      display:inline-flex; align-items:center; gap:.4rem;
+      background: var(--emas); color: var(--g-tua);
+      border:none; border-radius:7px;
+      padding:.4rem .9rem; font-size:.75rem; font-weight:700;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      cursor:pointer; transition:background .15s; flex-shrink:0;
+    }
+    .btn-pdf:hover { background: #00897B; color:#fff; }
+
+    @media print {
+      #sidebar, #topbar, #overlay, .btn-pdf, .btn-ref, .legend { display:none!important; }
+      #main { margin-left:0!important; }
+      .page { display:none!important; padding:0!important; }
+      .page.print-target { display:block!important; }
+      .page.print-target .legend { display:flex!important; flex-wrap:wrap; margin-bottom:.5rem; }
+      body { background:#fff!important; }
+      .card { box-shadow:none!important; border:1px solid #ccc!important; border-radius:0!important; }
+      .card-hdr { background:#00796B!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .card-ttl { color:#fff!important; }
+      thead th { background:#00796B!important; color:#fff!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      td.c-H { background:#D1FAE5!important; color:#065F46!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      td.c-M { background:#FEE2E2!important; color:#991B1B!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      td.c-K { background:#FEF9C3!important; color:#854D0E!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      tr.row-prov td { background:#E0F2F1!important; color:#00796B!important; font-weight:700!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      tr.row-total td { background:#B2DFDB!important; color:#004D40!important; font-weight:700!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      tr.row-tidak-hadir td { background:#1a1a1a!important; color:#fff!important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .print-legend { display:flex!important; }
+      .print-header { display:block!important; }
+      table { font-size:9pt!important; }
+      td, th { padding:4px 6px!important; }
+    }
+    .print-legend {
+      display:none;
+      align-items:center; gap:1rem; flex-wrap:wrap;
+      margin-bottom:.75rem; font-size:8pt;
+    }
+    .print-legend-item { display:flex; align-items:center; gap:.3rem; font-size:8pt; }
+    .print-legend-dot { width:10px; height:10px; border-radius:2px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .print-header { display:none; font-size:10pt; font-weight:700; margin-bottom:.5rem; color:#00796B; }
+
+        @media(max-width:768px){
+      #sidebar{transform:translateX(-100%);}
+      #sidebar.open{transform:translateX(0);}
+      #main{margin-left:0;}
+      .burger{display:block;}
+      #overlay.show{display:block;}
+      .page{padding:1rem;}
+      #topbar{padding:0 1rem;}
+      .hero-summary{padding:2rem 1.25rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-badge">HKG</div>
+    <div class="sb-title">Dashboard Registrasi<br>HKG PKK Ke-54</div>
+    <div class="sb-sub">Ditjen BPD · Kemendagri</div>
+  </div>
+  <div class="sb-sec">Nasional</div>
+  <nav>
+    <a href="#" class="active" data-page="p-home"><span class="nav-icon">🏠</span>Beranda</a>
+    <a href="#" data-page="p-nasional"><span class="nav-icon">🏛</span>Rekapitulasi Nasional</a>
+    <a href="#" data-page="p-unsur"><span class="nav-icon">📊</span>Rekap Per Unsur</a>
+    <a href="#" data-page="p-ketua"><span class="nav-icon">👤</span>Ketua Per Provinsi</a>
+    <a href="#" data-page="p-summary"><span class="nav-icon">📋</span>Summary Points</a>
+  </nav>
+  <div class="sb-sec">Provinsi</div>
+  <nav>
+    <a href="#" data-page="p-provinsi"><span class="nav-icon">🗾</span>Data Provinsi</a>
+  </nav>
+  <div class="sb-sec">Per Wilayah</div>
+  <nav>
+    <a href="#" data-page="p-sumatera"><span class="nav-icon">🗺</span>Sumatera</a>
+    <a href="#" data-page="p-jawabali"><span class="nav-icon">🗺</span>Jawa & Bali</a>
+    <a href="#" data-page="p-kalimantan"><span class="nav-icon">🗺</span>Kalimantan</a>
+    <a href="#" data-page="p-sulawesi"><span class="nav-icon">🗺</span>Sulawesi</a>
+    <a href="#" data-page="p-nusra"><span class="nav-icon">🗺</span>Nusra, Maluku & Papua</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="s-pill">
+      <div class="s-dot loading" id="sDot"></div>
+      <div class="s-info">
+        <span class="s-txt" id="sTxt">Memuat…</span>
+        <span class="s-time" id="sTime">–</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" onclick="closeSB()"></div>
+
+<div id="main">
+  <div id="topbar">
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <button class="burger" onclick="openSB()">☰</button>
+      <div class="tb-title" id="tbTitle">Beranda <span>· HKG PKK Ke-54</span></div>
+    </div>
+    <button class="btn-ref" id="btnRef" onclick="fetchAll(true)">↻ Perbarui</button>
+  </div>
+
+  <!-- ══ HOME PAGE ══ -->
+  <div class="page active" id="p-home">
+    <div class="hero-summary">
+      <div class="hero-eyebrow">Total Peserta Terdaftar · HKG PKK Ke-54</div>
+      <div class="hero-number" id="heroTotal"><span class="hero-loading">···</span></div>
+      <div class="hero-label">Peserta dari seluruh Indonesia</div>
+      <div class="hero-pct-wrap">
+        <span class="hero-pct-label">Persentase Realisasi</span>
+        <span class="hero-pct-value" id="heroPct">···</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NASIONAL -->
+  <div class="page" id="p-nasional">
+    <div class="legend">
+      <span class="leg-lbl">Keterangan:</span>
+      <span class="leg-item"><span class="leg-dot ld-H"></span>Memenuhi kuota</span>
+      <span class="leg-item"><span class="leg-dot ld-M"></span>Kurang dari kuota</span>
+      <span class="leg-item"><span class="leg-dot ld-K"></span>Melebihi kuota</span>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekapitulasi Data Nasional</span></div></div>
+      <div class="tbl-wrap"><div id="tbl-nasional"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <!-- PER UNSUR -->
+  <div class="page" id="p-unsur">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekapitulasi Per Unsur</span></div></div>
+      <div class="tbl-wrap"><div id="tbl-unsur"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <!-- KETUA -->
+  <div class="page" id="p-ketua">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Nama Ketua Terdaftar Per Provinsi</span></div></div>
+      <div class="tbl-wrap"><div id="tbl-ketua"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="page" id="p-summary">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Summary Points</span></div></div>
+      <div class="tbl-wrap"><div id="tbl-summary"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <!-- WILAYAH -->
+  <div class="page" id="p-sumatera">
+    <div class="legend"><span class="leg-lbl">Keterangan:</span><span class="leg-item"><span class="leg-dot ld-H"></span>Memenuhi kuota</span><span class="leg-item"><span class="leg-dot ld-M"></span>Kurang</span><span class="leg-item"><span class="leg-dot ld-K"></span>Melebihi</span></div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekap Kab/Kota — Wilayah Sumatera</span></div>
+      <button class="btn-pdf" onclick="downloadPDF('tbl-sumatera', 'Rekap Wilayah Sumatera')">⬇ Download PDF</button>
+    </div>
+      <div class="tbl-wrap"><div id="tbl-sumatera"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-jawabali">
+    <div class="legend"><span class="leg-lbl">Keterangan:</span><span class="leg-item"><span class="leg-dot ld-H"></span>Memenuhi kuota</span><span class="leg-item"><span class="leg-dot ld-M"></span>Kurang</span><span class="leg-item"><span class="leg-dot ld-K"></span>Melebihi</span></div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekap Kab/Kota — Wilayah Jawa &amp; Bali</span></div>
+      <button class="btn-pdf" onclick="downloadPDF('tbl-jawabali', 'Rekap Wilayah Jawa & Bali')">⬇ Download PDF</button>
+    </div>
+      <div class="tbl-wrap"><div id="tbl-jawabali"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-kalimantan">
+    <div class="legend"><span class="leg-lbl">Keterangan:</span><span class="leg-item"><span class="leg-dot ld-H"></span>Memenuhi kuota</span><span class="leg-item"><span class="leg-dot ld-M"></span>Kurang</span><span class="leg-item"><span class="leg-dot ld-K"></span>Melebihi</span></div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekap Kab/Kota — Wilayah Kalimantan</span></div>
+      <button class="btn-pdf" onclick="downloadPDF('tbl-kalimantan', 'Rekap Wilayah Kalimantan')">⬇ Download PDF</button>
+    </div>
+      <div class="tbl-wrap"><div id="tbl-kalimantan"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-sulawesi">
+    <div class="legend"><span class="leg-lbl">Keterangan:</span><span class="leg-item"><span class="leg-dot ld-H"></span>Memenuhi kuota</span><span class="leg-item"><span class="leg-dot ld-M"></span>Kurang</span><span class="leg-item"><span class="leg-dot ld-K"></span>Melebihi</span></div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekap Kab/Kota — Wilayah Sulawesi</span></div>
+      <button class="btn-pdf" onclick="downloadPDF('tbl-sulawesi', 'Rekap Wilayah Sulawesi')">⬇ Download PDF</button>
+    </div>
+      <div class="tbl-wrap"><div id="tbl-sulawesi"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-nusra">
+    <div class="legend"><span class="leg-lbl">Keterangan:</span><span class="leg-item"><span class="leg-dot ld-H"></span>Memenuhi kuota</span><span class="leg-item"><span class="leg-dot ld-M"></span>Kurang</span><span class="leg-item"><span class="leg-dot ld-K"></span>Melebihi</span></div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Rekap Kab/Kota — Nusra, Maluku &amp; Papua</span></div>
+      <button class="btn-pdf" onclick="downloadPDF('tbl-nusra', 'Rekap Nusra, Maluku & Papua')">⬇ Download PDF</button>
+    </div>
+      <div class="tbl-wrap"><div id="tbl-nusra"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    </div>
+  </div>
+
+  <!-- ══ DATA PROVINSI PAGE ══ -->
+  <div class="page" id="p-provinsi">
+    <div class="prov-page-wrap">
+      <div class="prov-search-wrap">
+        <span class="prov-search-icon">🔍</span>
+        <input type="text" id="provSearch" placeholder="Cari provinsi… (contoh: Aceh, Jawa, Papua)" oninput="filterProvince(this.value)" autocomplete="off"/>
+      </div>
+      <div class="prov-grid" id="provGrid"></div>
+      <div class="prov-data-panel" id="provPanel">
+        <div class="prov-data-header">
+          <div>
+            <div class="prov-breadcrumb">Dashboard &rsaquo; Data Provinsi &rsaquo; <span id="provBreadcrumb">–</span></div>
+            <div class="prov-data-title" id="provPanelTitle">–<small id="provPanelSub"></small></div>
+          </div>
+          <div class="prov-nav-btns">
+            <button class="prov-nav-btn" id="btnProvPrev" onclick="navigateProv(-1)">&#8592; Sebelumnya</button>
+            <button class="prov-nav-btn" id="btnProvNext" onclick="navigateProv(1)">Berikutnya &#8594;</button>
+          </div>
+        </div>
+        <div class="prov-data-body" id="provDataBody">
+          <div class="prov-welcome">
+            <div class="prov-welcome-icon">🗾</div>
+            <h3>Pilih Provinsi</h3>
+            <p>Klik salah satu kartu provinsi di atas untuk menampilkan data registrasi peserta HKG PKK Ke-54 dari provinsi tersebut.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SID = '1sSTX5qDoK6bsoYHFyCKiH4pqN8nsv9zJIUPUHulVjE4';
+const REFRESH = 30000;
+
+function csvUrl(sheet, range) {
+  return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&range=${encodeURIComponent(range)}&t=${Date.now()}`;
+}
+
+function parseCSV(txt) {
+  const rows=[];let row=[],f='',inQ=false;
+  for(let i=0;i<txt.length;i++){
+    const c=txt[i],n=txt[i+1];
+    if(inQ){if(c==='"'&&n==='"'){f+='"';i++;}else if(c==='"'){inQ=false;}else f+=c;}
+    else{if(c==='"'){inQ=true;}else if(c===','){row.push(f);f='';}
+    else if(c==='\r'&&n==='\n'){row.push(f);f='';rows.push(row);row=[];i++;}
+    else if(c==='\n'||c==='\r'){row.push(f);f='';rows.push(row);row=[];}
+    else f+=c;}
+  }
+  if(f||row.length){row.push(f);rows.push(row);}
+  while(rows.length&&rows[rows.length-1].every(x=>!x.trim()))rows.pop();
+  return rows;
+}
+
+function toNum(s){const v=parseFloat(String(s).replace(/[,\s]/g,''));return isNaN(v)?null:v;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function isNum(s){return s&&/^-?[\d.,]+%?$/.test(s.trim());}
+
+function colorCell(val, kuota) {
+  const n = toNum(val);
+  if (n === null) return '';
+  if (n === 0)    return 'c-M';
+  if (n === kuota) return 'c-H';
+  if (n > kuota)   return 'c-K';
+  return 'c-M';
+}
+
+// ── HERO: fetch single cells B49 and E49
+async function fetchHero() {
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch(csvUrl('DASHBOARD','B49')).then(r=>r.text()),
+      fetch(csvUrl('DASHBOARD','E49')).then(r=>r.text()),
+    ]);
+    const total = parseCSV(r1)?.[0]?.[0]?.trim() || '–';
+    const pct   = parseCSV(r2)?.[0]?.[0]?.trim() || '–';
+    document.getElementById('heroTotal').textContent = total;
+    document.getElementById('heroPct').textContent   = pct;
+  } catch(e) {
+    document.getElementById('heroTotal').textContent = '–';
+    document.getElementById('heroPct').textContent   = '–';
+  }
+}
+
+// ── RENDER NASIONAL (B3:I42)
+// cols: 0=Nama, 1=Provinsi(max7), 2=KabKota aktual, 3=OPD(max1), 4-6=skip, 7=KuotaKab
+function renderNasional(rows) {
+  if(!rows||!rows.length) return emptyBox();
+  const [head,...body] = rows;
+  const headers = [head[0]||'', head[1]||'', head[2]||'', head[3]||''];
+  let html = `<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>`;
+  body.forEach(cells => {
+    if(cells.every(c=>!c.trim())) return;
+    const nama = cells[0]||'';
+    if(/^(TOTAL|JUMLAH|GRAND)/i.test(nama.trim())) {
+      html+=`<tr class="row-total"><td>${esc(nama)}</td><td class="num">${esc(cells[1]||'')}</td><td class="num">${esc(cells[2]||'')}</td><td class="num">${esc(cells[3]||'')}</td></tr>`;
+      return;
+    }
+    if(!nama.trim()) return;
+    const clProv = colorCell(cells[1], 7);
+    const kuotaKab = toNum(cells[7]);
+    const clKab  = kuotaKab !== null ? colorCell(cells[2], kuotaKab) : '';
+    const clOpd  = colorCell(cells[3], 1);
+    html += `<tr>
+      <td>${esc(nama)}</td>
+      <td class="num ${clProv}">${esc(cells[1]||'')}</td>
+      <td class="num ${clKab}">${esc(cells[2]||'')}</td>
+      <td class="num ${clOpd}">${esc(cells[3]||'')}</td>
+    </tr>`;
+  });
+  return html + '</tbody></table>';
+}
+
+// ── RENDER REKAP per wilayah
+// A=Nama, B=jml Provinsi (baris prov saja), C=jml KabKota, D=OPD (baris prov saja)
+function renderRekap(rows) {
+  if(!rows||!rows.length) return emptyBox();
+  const [head,...body] = rows;
+  // Only display cols A-D (index 0-3), col E (index 4) is flag only
+  const headers = (head||[]).slice(0,4);
+  let out = '<table><thead><tr>' + headers.map(h=>'<th>'+esc(h)+'</th>').join('') + '</tr></thead><tbody>';
+
+  body.forEach(cells => {
+    while(cells.length < 5) cells.push('');
+    const a = cells[0].trim();
+    const b = cells[1].trim();
+    const c = cells[2].trim();
+    const d = cells[3].trim();
+    const e = cells[4].trim(); // kolom flag TIDAK_HADIR
+
+    if(!a && !b && !c && !d) return;
+
+    // TOTAL row
+    if(/^(TOTAL|JUMLAH|GRAND)/i.test(a)) {
+      out += '<tr class="row-total">'
+        + '<td>'+esc(a)+'</td>'
+        + '<td class="num">'+esc(b)+'</td>'
+        + '<td class="num">'+esc(c)+'</td>'
+        + '<td class="num">'+esc(d)+'</td>'
+        + '</tr>';
+      return;
+    }
+
+    const bNum = toNum(b);
+
+    // PROVINSI row
+    if(bNum !== null) {
+      const clB = colorCell(b, 7);
+      const clD = toNum(d) !== null ? colorCell(d, 1) : '';
+      out += '<tr class="row-prov">'
+        + '<td>'+esc(a)+'</td>'
+        + '<td class="num '+clB+'">'+esc(b)+'</td>'
+        + '<td class="num">'+esc(c)+'</td>'
+        + '<td class="num '+clD+'">'+esc(d)+'</td>'
+        + '</tr>';
+      return;
+    }
+
+    // KAB/KOTA — cek kolom E untuk flag TIDAK_HADIR
+    const isTidakHadir = e === 'TIDAK_HADIR';
+
+    if(isTidakHadir) {
+      out += '<tr class="row-tidak-hadir">'
+        + '<td style="padding-left:1.75rem">'+esc(a)+'</td>'
+        + '<td></td>'
+        + '<td style="text-align:center;font-style:italic;">Tidak Hadir - Sudah Bersurat</td>'
+        + '<td></td>'
+        + '</tr>';
+    } else {
+      const clC = colorCell(c, 3);
+      out += '<tr>'
+        + '<td style="padding-left:1.75rem">'+esc(a)+'</td>'
+        + '<td class="num">'+esc(b)+'</td>'
+        + '<td class="num '+clC+'">'+esc(c)+'</td>'
+        + '<td class="num">'+esc(d)+'</td>'
+        + '</tr>';
+    }
+  });
+
+  return out + '</tbody></table>';
+}
+
+
+function renderGeneric(rows) {
+  if(!rows||!rows.length) return emptyBox();
+  const [head,...body] = rows;
+  const hasHead = head.some(c=>c.trim());
+  let html = `<table>`;
+  if(hasHead) html+=`<thead><tr>${head.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>`;
+  html+=`<tbody>`;
+  (hasHead?body:rows).forEach(cells=>{
+    if(cells.every(c=>!c.trim())) return;
+    const isTot=/^(TOTAL|JUMLAH|GRAND)/i.test((cells[0]||'').trim());
+    html+=`<tr class="${isTot?'row-total':''}">${cells.map((c,i)=>`<td class="${isNum(c)&&i>0?'num':''}">${esc(c)}</td>`).join('')}</tr>`;
+  });
+  return html+'</tbody></table>';
+}
+
+function emptyBox(){return `<div class="state-box"><p>Data kosong atau belum tersedia.</p></div>`;}
+function errBox(msg){return `<div class="state-box err"><p>⚠ ${esc(msg)}</p></div>`;}
+
+// ── SECTIONS
+const SECTIONS = [
+  {id:'tbl-nasional',  sheet:'DASHBOARD',range:'B3:I42',   render:'nasional'},
+  {id:'tbl-unsur',     sheet:'DASHBOARD',range:'B53:F62',  render:'generic'},
+  {id:'tbl-ketua',     sheet:'DASHBOARD',range:'G77:H115', render:'generic'},
+  {id:'tbl-summary',   sheet:'DASHBOARD',range:'B78:E86',  render:'generic'},
+  {id:'tbl-sumatera',  sheet:'REKAPITULASI',    range:'A5:E198',  render:'rekap'},
+  {id:'tbl-jawabali',  sheet:'REKAPITULASI',    range:'A199:E354',render:'rekap'},
+  {id:'tbl-kalimantan',sheet:'REKAPITULASI',    range:'A395:E470',render:'rekap'},
+  {id:'tbl-sulawesi',  sheet:'REKAPITULASI',    range:'A471:E575',render:'rekap'},
+  {id:'tbl-nusra',     sheet:'REKAPITULASI',    range:['A355:E394','A576:E670'],render:'rekap',multi:true},
+];
+
+function doRender(rows,type){
+  if(type==='nasional') return renderNasional(rows);
+  if(type==='rekap')    return renderRekap(rows);
+  return renderGeneric(rows);
+}
+
+async function fetchSection(s) {
+  const el = document.getElementById(s.id);
+  try {
+    let rows;
+    if(s.multi){
+      const [r1,r2] = await Promise.all(s.range.map(async rng=>{
+        const res=await fetch(csvUrl(s.sheet,rng));
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const txt=await res.text();
+        if(txt.trim().startsWith('<!')) throw new Error('Belum di-Publish to Web.');
+        return parseCSV(txt);
+      }));
+      rows=[...r1,...r2.slice(1)];
+    } else {
+      const res=await fetch(csvUrl(s.sheet,s.range));
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const txt=await res.text();
+      if(txt.trim().startsWith('<!')) throw new Error('Belum di-Publish to Web.');
+      rows=parseCSV(txt);
+    }
+    el.innerHTML=doRender(rows,s.render);
+  } catch(err){
+    el.innerHTML=errBox(err.message);
+    throw err;
+  }
+}
+
+// ── STATUS
+function setStatus(state,txt){
+  document.getElementById('sDot').className='s-dot '+(state==='ok'?'':state);
+  document.getElementById('sTxt').textContent=txt;
+}
+function setTime(){
+  document.getElementById('sTime').textContent=
+    new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+async function fetchAll(manual=false){
+  if(manual){const b=document.getElementById('btnRef');b.disabled=true;setTimeout(()=>b.disabled=false,3000);}
+  setStatus('loading','Memperbarui…');
+  let errs=0;
+  await Promise.all([
+    fetchHero().catch(()=>{}),
+    ...SECTIONS.map(s=>fetchSection(s).catch(()=>errs++))
+  ]);
+  errs===0?(setStatus('ok','Live'),setTime())
+  :errs===SECTIONS.length?setStatus('error','Gagal terhubung')
+  :(setStatus('error',`${errs} error`),setTime());
+}
+
+// ── NAV
+const TITLES={
+  'p-home':'Beranda','p-nasional':'Rekapitulasi Nasional',
+  'p-unsur':'Rekap Per Unsur','p-ketua':'Ketua Per Provinsi','p-summary':'Summary Points',
+  'p-sumatera':'Wilayah Sumatera','p-jawabali':'Wilayah Jawa & Bali',
+  'p-kalimantan':'Wilayah Kalimantan','p-sulawesi':'Wilayah Sulawesi',
+  'p-nusra':'Nusra, Maluku & Papua',
+  'p-provinsi':'Data Provinsi',
+};
+document.querySelectorAll('nav a[data-page]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const pid=a.dataset.page;
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(pid).classList.add('active');
+    document.querySelectorAll('nav a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    document.getElementById('tbTitle').innerHTML=`${TITLES[pid]} <span>· HKG PKK Ke-54</span>`;
+    closeSB();
+  });
+});
+function openSB(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show');}
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+
+
+// ════════════════════════════════════════
+//  DATA PROVINSI
+// ════════════════════════════════════════
+const PROVINCES = [
+  { name:'Aceh',             code:'ACEH',        sheet:'ACEH',        range:'A1:O50', icon:'🌴' },
+  { name:'Sumatera Utara',   code:'SUMUT',        sheet:'SUMUT',       range:'A1:O50', icon:'🏔' },
+  { name:'Sumatera Barat',   code:'SUMBAR',       sheet:'SUMBAR',      range:'A1:O50', icon:'🌋' },
+  { name:'Sumatera Selatan', code:'SUMSEL',       sheet:'SUMSEL',      range:'A1:O50', icon:'🛢' },
+  { name:'Riau',             code:'RIAU',         sheet:'RIAU',        range:'A1:O50', icon:'🌊' },
+  { name:'Kepulauan Riau',   code:'KEPRI',        sheet:'KEPRI',       range:'A1:O50', icon:'🏝' },
+  { name:'Jambi',            code:'JAMBI',        sheet:'JAMBI',       range:'A1:O50', icon:'🌿' },
+  { name:'Bengkulu',         code:'BENGKULU',     sheet:'BENGKULU',    range:'A1:O50', icon:'🦏' },
+  { name:'Bangka Belitung',  code:'BABEL',        sheet:'BABEL',       range:'A1:O50', icon:'⛏' },
+  { name:'Lampung',          code:'LAMPUNG',      sheet:'LAMPUNG',     range:'A1:O50', icon:'🐘' },
+  { name:'Kalimantan Barat', code:'KALBAR',       sheet:'KALBAR',      range:'A1:O50', icon:'🌳' },
+  { name:'Kalimantan Selatan',code:'KALSEL',      sheet:'KALSEL',      range:'A1:O50', icon:'💎' },
+  { name:'Kalimantan Timur', code:'KALTIM',       sheet:'KALTIM',      range:'A1:O50', icon:'🏗' },
+  { name:'Kalimantan Utara', code:'KALTARA',      sheet:'KALTARA',     range:'A1:O50', icon:'🦅' },
+  { name:'Kalimantan Tengah',code:'KALTENG',      sheet:'KALTENG',     range:'A1:O50', icon:'🌲' },
+  { name:'Jawa Timur',       code:'JATIM',        sheet:'JATIM',       range:'A1:O50', icon:'🏛' },
+  { name:'Banten',           code:'BANTEN',       sheet:'BANTEN',      range:'A1:O50', icon:'🕌' },
+  { name:'Jawa Barat',       code:'JABAR',        sheet:'JABAR',       range:'A1:O50', icon:'🏙' },
+  { name:'Jawa Tengah',      code:'JATENG',       sheet:'JATENG',      range:'A1:O50', icon:'🎭' },
+  { name:'DKI Jakarta',      code:'JAKARTA',      sheet:'JAKARTA',     range:'A1:O50', icon:'🏢' },
+  { name:'DI Yogyakarta',    code:'JOGJA',        sheet:'JOGJA',       range:'A1:O50', icon:'🏯' },
+  { name:'Bali',             code:'BALI',         sheet:'BALI',        range:'A1:O50', icon:'🌺' },
+  { name:'Gorontalo',        code:'GORONTALO',    sheet:'GORONTALO',   range:'A1:O50', icon:'🌾' },
+  { name:'Sulawesi Tenggara',code:'SULTRA',       sheet:'SULTRA',      range:'A1:O50', icon:'⚓' },
+  { name:'Sulawesi Selatan', code:'SULSEL',       sheet:'SULSEL',      range:'A1:O50', icon:'🚢' },
+  { name:'Sulawesi Utara',   code:'SULUT',        sheet:'SULUT',       range:'A1:O50', icon:'🌺' },
+  { name:'Sulawesi Barat',   code:'SULBAR',       sheet:'SULBAR',      range:'A1:O50', icon:'🎣' },
+  { name:'Sulawesi Tengah',  code:'SULTENG',      sheet:'SULTENG',     range:'A1:O50', icon:'🌿' },
+  { name:'NTB',              code:'NTB',          sheet:'NTB',         range:'A1:O50', icon:'🐎' },
+  { name:'NTT',              code:'NTT',          sheet:'NTT',         range:'A1:O50', icon:'🦎' },
+  { name:'Maluku',           code:'MALUKU',       sheet:'MALUKU',      range:'A1:O50', icon:'🐚' },
+  { name:'Maluku Utara',     code:'MALUT',        sheet:'MALUT',       range:'A1:O50', icon:'🌴' },
+  { name:'Papua',            code:'PAPUA',        sheet:'PAPUA',       range:'A1:O50', icon:'🦜' },
+  { name:'Papua Barat Daya', code:'PBD',          sheet:'PBD',         range:'A1:O50', icon:'🌊' },
+  { name:'Papua Barat',      code:'PAPUABARAT',   sheet:'PAPUABARAT',  range:'A1:O50', icon:'🌿' },
+  { name:'Papua Tengah',     code:'PAPTENG',      sheet:'PAPTENG',     range:'A1:O50', icon:'🏔' },
+  { name:'Papua Selatan',    code:'PAPSEL',       sheet:'PAPSEL',      range:'A1:O50', icon:'🌾' },
+  { name:'Papua Pegunungan', code:'PEGUNUNGAN',   sheet:'PEGUNUNGAN',  range:'A1:O50', icon:'⛰' },
+];
+
+let activeProvIdx = -1;
+
+function buildProvGrid() {
+  const grid = document.getElementById('provGrid');
+  grid.innerHTML = PROVINCES.map((p, i) => `
+    <div class="prov-card" id="pcard-${i}" onclick="selectProvince(${i})" title="Lihat data ${p.name}">
+      <div class="prov-card-badge"></div>
+      <div class="prov-card-icon">${p.icon}</div>
+      <div class="prov-card-name">${p.name}</div>
+      <div class="prov-card-hint">Klik untuk melihat data</div>
+    </div>
+  `).join('');
+}
+
+function filterProvince(q) {
+  const term = q.toLowerCase().trim();
+  let visible = 0;
+  PROVINCES.forEach((p, i) => {
+    const card = document.getElementById('pcard-' + i);
+    const match = !term || p.name.toLowerCase().includes(term) || p.code.toLowerCase().includes(term);
+    card.classList.toggle('hidden', !match);
+    if (match) visible++;
+  });
+  // Show/hide no-result message
+  let noRes = document.getElementById('provNoResult');
+  if (!noRes) {
+    noRes = document.createElement('div');
+    noRes.id = 'provNoResult';
+    noRes.className = 'prov-empty-search';
+    noRes.innerHTML = '🔍 Tidak ada provinsi yang cocok dengan pencarian Anda.';
+    document.getElementById('provGrid').appendChild(noRes);
+  }
+  noRes.style.display = visible === 0 ? 'block' : 'none';
+}
+
+async function selectProvince(idx) {
+  if (idx < 0 || idx >= PROVINCES.length) return;
+  const prov = PROVINCES[idx];
+  activeProvIdx = idx;
+
+  // Update card active state
+  document.querySelectorAll('.prov-card').forEach(c => c.classList.remove('active-card'));
+  const card = document.getElementById('pcard-' + idx);
+  if (card) {
+    card.classList.add('active-card');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Show panel
+  const panel = document.getElementById('provPanel');
+  panel.classList.add('show');
+
+  // Update header
+  document.getElementById('provBreadcrumb').textContent = prov.name;
+  document.getElementById('provPanelTitle').innerHTML = `Data Provinsi ${prov.name}<small>${prov.sheet}!${prov.range}</small>`;
+
+  // Nav buttons
+  document.getElementById('btnProvPrev').disabled = idx === 0;
+  document.getElementById('btnProvNext').disabled = idx === PROVINCES.length - 1;
+
+  // Show loading
+  document.getElementById('provDataBody').innerHTML = `
+    <div class="prov-loading">
+      <div class="spinner"></div>
+      <p>Memuat data <strong>${prov.name}</strong>…</p>
+    </div>`;
+
+  // Scroll panel into view
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+  // Fetch data
+  try {
+    const url = csvUrl(prov.sheet, prov.range);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    if (txt.trim().startsWith('<!')) throw new Error('Sheet belum di-Publish to Web atau nama sheet salah.');
+    const rows = parseCSV(txt);
+
+    // Filter empty rows
+    const filled = rows.filter(r => r.some(c => c.trim()));
+    if (!filled.length) {
+      document.getElementById('provDataBody').innerHTML = `
+        <div class="prov-empty-state">
+          <div class="prov-empty-icon">📭</div>
+          <h3>Data Belum Tersedia</h3>
+          <p>Belum ada data yang tercatat untuk Provinsi <strong>${prov.name}</strong> pada HKG PKK Ke-54.</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('provDataBody').innerHTML = renderGeneric(filled);
+  } catch(err) {
+    document.getElementById('provDataBody').innerHTML = `
+      <div class="prov-empty-state">
+        <div class="prov-empty-icon">⚠️</div>
+        <h3>Gagal Memuat Data</h3>
+        <p>${esc(err.message)}</p>
+      </div>`;
+  }
+}
+
+function navigateProv(dir) {
+  const next = activeProvIdx + dir;
+  if (next >= 0 && next < PROVINCES.length) {
+    // Also clear hidden cards when navigating
+    document.getElementById('provSearch').value = '';
+    filterProvince('');
+    selectProvince(next);
+  }
+}
+
+// Build grid on load
+buildProvGrid();
+
+
+// ════════════════════════════════════════
+//  DOWNLOAD PDF
+// ════════════════════════════════════════
+async function downloadPDF(tableId, title) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Menyiapkan…';
+
+  try {
+    const { jsPDF } = window.jspdf;
+
+    // Build a clean print-ready div
+    const tblEl = document.getElementById(tableId);
+    const tbl = tblEl ? tblEl.querySelector('table') : null;
+    if (!tbl) { alert('Data belum dimuat. Tunggu data tampil dulu.'); return; }
+
+    // Create off-screen capture container
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:1000px;background:#fff;padding:24px;font-family:Plus Jakarta Sans,sans-serif;';
+
+    // Title block
+    const now = new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+    wrap.innerHTML = `
+      <div style="margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #00796B;">
+        <div style="font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#00796B;font-weight:700;margin-bottom:4px;">DASHBOARD REGISTRASI HKG PKK KE-54</div>
+        <div style="font-size:15px;font-weight:800;color:#00796B;">${title}</div>
+        <div style="font-size:9px;color:#6B7280;margin-top:3px;">Dicetak: ${now} &nbsp;·&nbsp; Subdit PKK, Ditjen BPD, Kemendagri</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;font-size:9px;">
+        <span style="font-weight:700;color:#4A7B76;text-transform:uppercase;letter-spacing:1px;">Keterangan:</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#D1FAE5;border:1px solid #6EE7B7;display:inline-block;"></span>Memenuhi kuota</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEE2E2;border:1px solid #FCA5A5;display:inline-block;"></span>Kurang dari kuota</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#FEF9C3;border:1px solid #FDE047;display:inline-block;"></span>Melebihi kuota</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#1a1a1a;display:inline-block;"></span><span style="color:#fff;background:#1a1a1a;padding:0 4px;border-radius:2px;">Tidak Hadir - Sudah Bersurat</span></span>
+      </div>`;
+
+    // Clone table with inline styles (to preserve colors)
+    const clonedTbl = tbl.cloneNode(true);
+    clonedTbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:9px;';
+
+    // Apply inline styles to all cells
+    const srcRows = tbl.querySelectorAll('tr');
+    const clnRows = clonedTbl.querySelectorAll('tr');
+    srcRows.forEach((srcRow, ri) => {
+      const clnRow = clnRows[ri];
+      if (!clnRow) return;
+
+      // Copy row-level class styles
+      const rc = srcRow.className;
+      if (rc.includes('row-total')) {
+        clnRow.querySelectorAll('td,th').forEach(td => {
+          td.style.cssText = 'background:#e0f2f1;color:#00796B;font-weight:700;padding:4px 8px;border:1px solid #B2DFDB;';
+        });
+      } else if (rc.includes('row-prov')) {
+        clnRow.querySelectorAll('td,th').forEach(td => {
+          td.style.cssText = 'background:#f0faf9;color:#00796B;font-weight:700;padding:4px 8px;border:1px solid #B2DFDB;';
+        });
+      } else if (rc.includes('row-tidak-hadir')) {
+        clnRow.querySelectorAll('td,th').forEach(td => {
+          td.style.cssText = 'background:#1a1a1a;color:#ffffff;font-style:italic;padding:4px 8px;border:1px solid #333;';
+        });
+      } else {
+        // Normal row — copy cell-level classes
+        srcRow.querySelectorAll('td,th').forEach((srcTd, ci) => {
+          const clnTd = clnRow.querySelectorAll('td,th')[ci];
+          if (!clnTd) return;
+          const cc = srcTd.className;
+          let style = 'padding:4px 8px;border:1px solid #E5E7EB;';
+          if (cc.includes('c-H')) style += 'background:#D1FAE5;color:#065F46;';
+          else if (cc.includes('c-M')) style += 'background:#FEE2E2;color:#991B1B;';
+          else if (cc.includes('c-K')) style += 'background:#FEF9C3;color:#854D0E;';
+          if (cc.includes('num')) style += 'text-align:center;font-weight:500;';
+          clnTd.style.cssText = style;
+        });
+      }
+
+      // Header row
+      clnRow.querySelectorAll('th').forEach(th => {
+        th.style.cssText = 'background:#00796B;color:#ffffff;font-weight:700;padding:5px 8px;border:1px solid #005B4F;text-align:left;font-size:9px;';
+      });
+    });
+
+    wrap.appendChild(clonedTbl);
+    document.body.appendChild(wrap);
+
+    // Capture
+    const canvas = await html2canvas(wrap, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+    });
+
+    document.body.removeChild(wrap);
+
+    // Build PDF
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const usableW = pageW - margin * 2;
+    const imgH = (canvas.height * usableW) / canvas.width;
+
+    let posY = margin;
+    let remaining = imgH;
+
+    while (remaining > 0) {
+      const sliceH = Math.min(remaining, pageH - margin * 2);
+      const srcY = (imgH - remaining) * (canvas.height / imgH);
+      const srcH = sliceH * (canvas.height / imgH);
+
+      // Slice canvas
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = srcH;
+      const ctx = pageCanvas.getContext('2d');
+      ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+      const pageImg = pageCanvas.toDataURL('image/png');
+
+      if (posY > margin) pdf.addPage();
+      pdf.addImage(pageImg, 'PNG', margin, margin, usableW, sliceH);
+      remaining -= sliceH;
+      posY += sliceH;
+    }
+
+    // Save
+    const filename = title.replace(/[^a-zA-Z0-9]/g, '_') + '_HKG_PKK_54.pdf';
+    pdf.save(filename);
+
+  } catch(err) {
+    alert('Gagal membuat PDF: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⬇ Download PDF';
+  }
+}
+
+
+// ════════════════════════════════════════
+//  DOWNLOAD PDF
+// ════════════════════════════════════════
+function downloadPDF(tblId, title) {
+  // Find the parent .page element of this table
+  const tbl = document.getElementById(tblId);
+  const page = tbl ? tbl.closest('.page') : null;
+  if(!page) { alert('Halaman tidak ditemukan'); return; }
+
+  // Activate the page if not visible
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('print-target','active'));
+  page.classList.add('print-target','active');
+
+  // Show keterangan warna di print
+  const legend = page.querySelector('.legend');
+  if(legend) legend.style.setProperty('display','flex','important');
+
+  const origTitle = document.title;
+  document.title = 'Rekap PKK - ' + title + ' - HKG PKK Ke-54';
+
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => {
+      document.title = origTitle;
+      if(legend) legend.style.removeProperty('display');
+      page.classList.remove('print-target');
+    }, 500);
+  }, 300);
+}
+
+fetchAll();
+setInterval(fetchAll,REFRESH);
+</script>
+</body>
+</html>
