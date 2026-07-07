@@ -463,7 +463,166 @@
     .print-legend-dot { width:10px; height:10px; border-radius:2px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     .print-header { display:none; font-size:10pt; font-weight:700; margin-bottom:.5rem; color:#00796B; }
 
-        @media(max-width:768px){
+    
+    /* ══ SUMMARY POINTS DASHBOARD ══ */
+    .sum-wrap { display:flex; flex-direction:column; gap:1.25rem; }
+
+    /* KPI ROW */
+    .sum-kpi-grid {
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:.85rem;
+    }
+    .sum-kpi-card {
+      background:var(--putih);
+      border:1.5px solid var(--border);
+      border-radius:14px;
+      padding:1.1rem 1rem;
+      display:flex; flex-direction:column; gap:.4rem;
+      box-shadow:0 1px 4px rgba(0,121,107,.06);
+      position:relative; overflow:hidden;
+    }
+    .sum-kpi-card::before {
+      content:''; position:absolute;
+      top:0; left:0; right:0; height:3px;
+      background:var(--emas);
+      border-radius:14px 14px 0 0;
+    }
+    .sum-kpi-card.kpi-green::before { background:#10B981; }
+    .sum-kpi-card.kpi-red::before   { background:#EF4444; }
+    .sum-kpi-card.kpi-yellow::before{ background:#F59E0B; }
+    .sum-kpi-card.kpi-main::before  { background:var(--g-tua); }
+
+    .sum-kpi-icon { font-size:1.4rem; margin-bottom:.1rem; }
+    .sum-kpi-label {
+      font-size:.68rem; font-weight:600;
+      color:var(--mid); text-transform:uppercase;
+      letter-spacing:.05em; line-height:1.3;
+    }
+    .sum-kpi-value {
+      font-size:2rem; font-weight:800;
+      color:var(--gelap); line-height:1;
+      font-family:'DM Mono',monospace;
+      letter-spacing:-.02em;
+    }
+    .sum-kpi-card.kpi-green .sum-kpi-value { color:#059669; }
+    .sum-kpi-card.kpi-red   .sum-kpi-value { color:#DC2626; }
+    .sum-kpi-card.kpi-yellow .sum-kpi-value{ color:#D97706; }
+    .sum-kpi-card.kpi-main  .sum-kpi-value { color:var(--g-tua); }
+
+    /* Progress bar */
+    .sum-progress-wrap { margin-top:.4rem; }
+    .sum-progress-track {
+      height:6px; background:var(--terang);
+      border-radius:99px; overflow:hidden;
+    }
+    .sum-progress-fill {
+      height:100%; border-radius:99px;
+      background:linear-gradient(90deg,var(--g-mid),var(--emas));
+      transition:width .8s ease;
+    }
+    .sum-progress-label {
+      font-size:.65rem; color:var(--mid);
+      margin-top:.25rem; font-family:'DM Mono',monospace;
+    }
+
+    /* STATUS ROW */
+    .sum-status-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:.85rem;
+    }
+    .sum-status-card {
+      background:var(--putih);
+      border:1.5px solid var(--border);
+      border-radius:14px;
+      padding:1.1rem 1.25rem;
+      display:flex; align-items:center; gap:1rem;
+      box-shadow:0 1px 4px rgba(0,121,107,.06);
+    }
+    .sum-status-icon {
+      width:48px; height:48px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; flex-shrink:0;
+    }
+    .sum-status-icon.si-green  { background:#D1FAE5; }
+    .sum-status-icon.si-red    { background:#FEE2E2; }
+    .sum-status-icon.si-yellow { background:#FEF3C7; }
+    .sum-status-info { display:flex; flex-direction:column; gap:.2rem; }
+    .sum-status-num {
+      font-size:2.2rem; font-weight:800;
+      font-family:'DM Mono',monospace;
+      line-height:1; letter-spacing:-.02em;
+    }
+    .sum-status-num.sn-green  { color:#059669; }
+    .sum-status-num.sn-red    { color:#DC2626; }
+    .sum-status-num.sn-yellow { color:#D97706; }
+    .sum-status-label {
+      font-size:.72rem; font-weight:600;
+      color:var(--mid); line-height:1.3;
+    }
+    .sum-status-sub {
+      font-size:.65rem; color:var(--mid);
+      opacity:.7;
+    }
+
+    /* DETAIL ROW */
+    .sum-detail-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:.85rem;
+    }
+    .sum-detail-card {
+      background:var(--putih);
+      border:1.5px solid var(--border);
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 1px 4px rgba(0,121,107,.06);
+    }
+    .sum-detail-hdr {
+      padding:.75rem 1rem;
+      display:flex; align-items:center; gap:.5rem;
+      border-bottom:1px solid var(--border);
+    }
+    .sum-detail-hdr.dh-green  { background:#D1FAE5; }
+    .sum-detail-hdr.dh-red    { background:#FEE2E2; }
+    .sum-detail-hdr.dh-yellow { background:#FEF3C7; }
+    .sum-detail-hdr-title {
+      font-size:.75rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:.04em;
+    }
+    .dh-green  .sum-detail-hdr-title { color:#065F46; }
+    .dh-red    .sum-detail-hdr-title { color:#991B1B; }
+    .dh-yellow .sum-detail-hdr-title { color:#92400E; }
+    .sum-detail-body { padding:.85rem 1rem; display:flex; flex-wrap:wrap; gap:.4rem; }
+    .sum-chip {
+      display:inline-flex; align-items:center;
+      padding:.25rem .6rem;
+      border-radius:99px;
+      font-size:.68rem; font-weight:600;
+      line-height:1.4; white-space:nowrap;
+    }
+    .sum-chip.chip-green  { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+    .sum-chip.chip-red    { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+    .sum-chip.chip-yellow { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; }
+    .sum-chip-empty {
+      font-size:.78rem; color:var(--mid);
+      font-style:italic; padding:.25rem 0;
+    }
+
+    /* Loading state */
+    #sum-dashboard { width:100%; }
+
+    @media(max-width:900px) {
+      .sum-kpi-grid { grid-template-columns:repeat(3,1fr); }
+    }
+    @media(max-width:640px) {
+      .sum-kpi-grid    { grid-template-columns:repeat(2,1fr); }
+      .sum-status-grid { grid-template-columns:1fr; }
+      .sum-detail-grid { grid-template-columns:1fr; }
+    }
+
+    @media(max-width:768px){
       #sidebar{transform:translateX(-100%);}
       #sidebar.open{transform:translateX(0);}
       #main{margin-left:0;}
@@ -571,9 +730,8 @@
 
   <!-- SUMMARY -->
   <div class="page" id="p-summary">
-    <div class="card">
-      <div class="card-hdr"><div class="card-ttl-row"><div class="card-pip"></div><span class="card-ttl">Summary Points</span></div></div>
-      <div class="tbl-wrap"><div id="tbl-summary"><div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div></div></div>
+    <div id="sum-dashboard">
+      <div class="state-box"><div class="spinner"></div><p>Mengambil data…</p></div>
     </div>
   </div>
 
@@ -835,7 +993,7 @@ const SECTIONS = [
   {id:'tbl-nasional',  sheet:'DASHBOARD',range:'B3:I42',   render:'nasional'},
   {id:'tbl-unsur',     sheet:'DASHBOARD',range:'B53:F62',  render:'generic'},
   {id:'tbl-ketua',     sheet:'DASHBOARD',range:'G77:H115', render:'generic'},
-  {id:'tbl-summary',   sheet:'DASHBOARD',range:'B78:E86',  render:'generic'},
+  {id:'tbl-summary',   sheet:'DASHBOARD',range:'B78:E86',  render:'summary'},
   {id:'tbl-sumatera',  sheet:'REKAPITULASI',    range:'A5:E198',  render:'rekap'},
   {id:'tbl-jawabali',  sheet:'REKAPITULASI',    range:'A199:E354',render:'rekap'},
   {id:'tbl-kalimantan',sheet:'REKAPITULASI',    range:'A395:E470',render:'rekap'},
@@ -846,6 +1004,7 @@ const SECTIONS = [
 function doRender(rows,type){
   if(type==='nasional') return renderNasional(rows);
   if(type==='rekap')    return renderRekap(rows);
+  if(type==='summary')  return renderSummary(rows);
   return renderGeneric(rows);
 }
 
@@ -869,7 +1028,11 @@ async function fetchSection(s) {
       if(txt.trim().startsWith('<!')) throw new Error('Belum di-Publish to Web.');
       rows=parseCSV(txt);
     }
-    el.innerHTML=doRender(rows,s.render);
+    if(s.render==='summary') {
+      document.getElementById('sum-dashboard').innerHTML = doRender(rows,s.render);
+    } else {
+      el.innerHTML=doRender(rows,s.render);
+    }
   } catch(err){
     el.innerHTML=errBox(err.message);
     throw err;
@@ -1084,6 +1247,145 @@ function navigateProv(dir) {
 buildProvGrid();
 
 
+
+// ════════════════════════════════════════
+//  RENDER SUMMARY POINTS DASHBOARD
+//  Struktur rows (B78:E86):
+//  Row 0: header (SUMMARY POINTS)
+//  Row 1: Total Peserta Terdaftar | | angka
+//  Row 2: Target Nasional | | angka
+//  Row 3: Capaian Target | | pct
+//  Row 4: Kekurangan Peserta | | angka
+//  Row 5: Total Melebihi Kuota | | angka
+//  Row 6: Provinsi Sesuai Kuota | jumlah | daftar nama
+//  Row 7: Provinsi Kelebihan | jumlah | daftar nama
+//  Row 8: Provinsi Kekurangan | jumlah | daftar nama
+// ════════════════════════════════════════
+function renderSummary(rows) {
+  if(!rows||rows.length<6) return emptyBox();
+
+  // Parse values — skip header row (row 0)
+  // Col index: B=0,C=1,D=2,E=3
+  function val(r,c){ return (rows[r]&&rows[r][c]) ? rows[r][c].trim() : ''; }
+
+  const totalPeserta   = val(1,2)||val(1,3);
+  const targetNasional = val(2,2)||val(2,3);
+  const capaianTarget  = val(3,2)||val(3,3);
+  const kekurangan     = val(4,2)||val(4,3);
+  const kelebihan      = val(5,2)||val(5,3);
+
+  // Status rows
+  const jmlSesuai   = val(6,2);
+  const namaSesuai  = val(6,3);
+  const jmlLebih    = val(7,2);
+  const namaLebih   = val(7,3);
+  const jmlKurang   = val(8,2);
+  const namaKurang  = val(8,3);
+
+  // Parse pct for progress bar
+  const pctNum = parseFloat(capaianTarget.replace('%','').replace(',','.')) || 0;
+
+  // Parse comma-separated province names into chips
+  function makeChips(str, cls) {
+    if(!str||!str.trim()) return '<span class="sum-chip-empty">Tidak ada data</span>';
+    return str.split(',').map(s=>s.trim()).filter(s=>s)
+      .map(s=>`<span class="sum-chip ${cls}">${esc(s)}</span>`).join('');
+  }
+
+  return `
+  <div class="sum-wrap">
+
+    <!-- BARIS 1: KPI Cards -->
+    <div class="sum-kpi-grid">
+      <div class="sum-kpi-card kpi-main">
+        <div class="sum-kpi-icon">👥</div>
+        <div class="sum-kpi-label">Total Peserta Terdaftar</div>
+        <div class="sum-kpi-value">${esc(totalPeserta)}</div>
+      </div>
+      <div class="sum-kpi-card">
+        <div class="sum-kpi-icon">🎯</div>
+        <div class="sum-kpi-label">Target Nasional</div>
+        <div class="sum-kpi-value">${esc(targetNasional)}</div>
+      </div>
+      <div class="sum-kpi-card kpi-green">
+        <div class="sum-kpi-icon">📈</div>
+        <div class="sum-kpi-label">Capaian Target</div>
+        <div class="sum-kpi-value">${esc(capaianTarget)}</div>
+        <div class="sum-progress-wrap">
+          <div class="sum-progress-track">
+            <div class="sum-progress-fill" style="width:${Math.min(pctNum,100)}%"></div>
+          </div>
+          <div class="sum-progress-label">${pctNum}% dari target nasional</div>
+        </div>
+      </div>
+      <div class="sum-kpi-card kpi-red">
+        <div class="sum-kpi-icon">⬇️</div>
+        <div class="sum-kpi-label">Kekurangan Peserta</div>
+        <div class="sum-kpi-value">${esc(kekurangan)}</div>
+      </div>
+      <div class="sum-kpi-card kpi-yellow">
+        <div class="sum-kpi-icon">⬆️</div>
+        <div class="sum-kpi-label">Kelebihan Peserta</div>
+        <div class="sum-kpi-value">${esc(kelebihan)}</div>
+      </div>
+    </div>
+
+    <!-- BARIS 2: Status Provinsi -->
+    <div class="sum-status-grid">
+      <div class="sum-status-card">
+        <div class="sum-status-icon si-green">🟢</div>
+        <div class="sum-status-info">
+          <div class="sum-status-num sn-green">${esc(jmlSesuai)}</div>
+          <div class="sum-status-label">Provinsi Sudah Sesuai Kuota</div>
+          <div class="sum-status-sub">Tidak ada kelebihan / kekurangan</div>
+        </div>
+      </div>
+      <div class="sum-status-card">
+        <div class="sum-status-icon si-red">🔴</div>
+        <div class="sum-status-info">
+          <div class="sum-status-num sn-red">${esc(jmlKurang)}</div>
+          <div class="sum-status-label">Provinsi Masih Kurang</div>
+          <div class="sum-status-sub">Memiliki kekurangan di tiap unsur</div>
+        </div>
+      </div>
+      <div class="sum-status-card">
+        <div class="sum-status-icon si-yellow">🟡</div>
+        <div class="sum-status-info">
+          <div class="sum-status-num sn-yellow">${esc(jmlLebih)}</div>
+          <div class="sum-status-label">Provinsi Melebihi Kuota</div>
+          <div class="sum-status-sub">Memiliki kelebihan di tiap unsur</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARIS 3: Detail Provinsi -->
+    <div class="sum-detail-grid">
+      <div class="sum-detail-card">
+        <div class="sum-detail-hdr dh-green">
+          <span>🟢</span>
+          <span class="sum-detail-hdr-title">Provinsi Sudah Sesuai (${esc(jmlSesuai)})</span>
+        </div>
+        <div class="sum-detail-body">${makeChips(namaSesuai,'chip-green')}</div>
+      </div>
+      <div class="sum-detail-card">
+        <div class="sum-detail-hdr dh-red">
+          <span>🔴</span>
+          <span class="sum-detail-hdr-title">Provinsi Masih Kurang (${esc(jmlKurang)})</span>
+        </div>
+        <div class="sum-detail-body">${makeChips(namaKurang,'chip-red')}</div>
+      </div>
+      <div class="sum-detail-card">
+        <div class="sum-detail-hdr dh-yellow">
+          <span>🟡</span>
+          <span class="sum-detail-hdr-title">Provinsi Melebihi Kuota (${esc(jmlLebih)})</span>
+        </div>
+        <div class="sum-detail-body">${makeChips(namaLebih,'chip-yellow')}</div>
+      </div>
+    </div>
+
+  </div>`;
+}
+
 // ════════════════════════════════════════
 //  DOWNLOAD PDF
 // ════════════════════════════════════════
@@ -1223,6 +1525,145 @@ async function downloadPDF(tableId, title) {
   }
 }
 
+
+
+// ════════════════════════════════════════
+//  RENDER SUMMARY POINTS DASHBOARD
+//  Struktur rows (B78:E86):
+//  Row 0: header (SUMMARY POINTS)
+//  Row 1: Total Peserta Terdaftar | | angka
+//  Row 2: Target Nasional | | angka
+//  Row 3: Capaian Target | | pct
+//  Row 4: Kekurangan Peserta | | angka
+//  Row 5: Total Melebihi Kuota | | angka
+//  Row 6: Provinsi Sesuai Kuota | jumlah | daftar nama
+//  Row 7: Provinsi Kelebihan | jumlah | daftar nama
+//  Row 8: Provinsi Kekurangan | jumlah | daftar nama
+// ════════════════════════════════════════
+function renderSummary(rows) {
+  if(!rows||rows.length<6) return emptyBox();
+
+  // Parse values — skip header row (row 0)
+  // Col index: B=0,C=1,D=2,E=3
+  function val(r,c){ return (rows[r]&&rows[r][c]) ? rows[r][c].trim() : ''; }
+
+  const totalPeserta   = val(1,2)||val(1,3);
+  const targetNasional = val(2,2)||val(2,3);
+  const capaianTarget  = val(3,2)||val(3,3);
+  const kekurangan     = val(4,2)||val(4,3);
+  const kelebihan      = val(5,2)||val(5,3);
+
+  // Status rows
+  const jmlSesuai   = val(6,2);
+  const namaSesuai  = val(6,3);
+  const jmlLebih    = val(7,2);
+  const namaLebih   = val(7,3);
+  const jmlKurang   = val(8,2);
+  const namaKurang  = val(8,3);
+
+  // Parse pct for progress bar
+  const pctNum = parseFloat(capaianTarget.replace('%','').replace(',','.')) || 0;
+
+  // Parse comma-separated province names into chips
+  function makeChips(str, cls) {
+    if(!str||!str.trim()) return '<span class="sum-chip-empty">Tidak ada data</span>';
+    return str.split(',').map(s=>s.trim()).filter(s=>s)
+      .map(s=>`<span class="sum-chip ${cls}">${esc(s)}</span>`).join('');
+  }
+
+  return `
+  <div class="sum-wrap">
+
+    <!-- BARIS 1: KPI Cards -->
+    <div class="sum-kpi-grid">
+      <div class="sum-kpi-card kpi-main">
+        <div class="sum-kpi-icon">👥</div>
+        <div class="sum-kpi-label">Total Peserta Terdaftar</div>
+        <div class="sum-kpi-value">${esc(totalPeserta)}</div>
+      </div>
+      <div class="sum-kpi-card">
+        <div class="sum-kpi-icon">🎯</div>
+        <div class="sum-kpi-label">Target Nasional</div>
+        <div class="sum-kpi-value">${esc(targetNasional)}</div>
+      </div>
+      <div class="sum-kpi-card kpi-green">
+        <div class="sum-kpi-icon">📈</div>
+        <div class="sum-kpi-label">Capaian Target</div>
+        <div class="sum-kpi-value">${esc(capaianTarget)}</div>
+        <div class="sum-progress-wrap">
+          <div class="sum-progress-track">
+            <div class="sum-progress-fill" style="width:${Math.min(pctNum,100)}%"></div>
+          </div>
+          <div class="sum-progress-label">${pctNum}% dari target nasional</div>
+        </div>
+      </div>
+      <div class="sum-kpi-card kpi-red">
+        <div class="sum-kpi-icon">⬇️</div>
+        <div class="sum-kpi-label">Kekurangan Peserta</div>
+        <div class="sum-kpi-value">${esc(kekurangan)}</div>
+      </div>
+      <div class="sum-kpi-card kpi-yellow">
+        <div class="sum-kpi-icon">⬆️</div>
+        <div class="sum-kpi-label">Kelebihan Peserta</div>
+        <div class="sum-kpi-value">${esc(kelebihan)}</div>
+      </div>
+    </div>
+
+    <!-- BARIS 2: Status Provinsi -->
+    <div class="sum-status-grid">
+      <div class="sum-status-card">
+        <div class="sum-status-icon si-green">🟢</div>
+        <div class="sum-status-info">
+          <div class="sum-status-num sn-green">${esc(jmlSesuai)}</div>
+          <div class="sum-status-label">Provinsi Sudah Sesuai Kuota</div>
+          <div class="sum-status-sub">Tidak ada kelebihan / kekurangan</div>
+        </div>
+      </div>
+      <div class="sum-status-card">
+        <div class="sum-status-icon si-red">🔴</div>
+        <div class="sum-status-info">
+          <div class="sum-status-num sn-red">${esc(jmlKurang)}</div>
+          <div class="sum-status-label">Provinsi Masih Kurang</div>
+          <div class="sum-status-sub">Memiliki kekurangan di tiap unsur</div>
+        </div>
+      </div>
+      <div class="sum-status-card">
+        <div class="sum-status-icon si-yellow">🟡</div>
+        <div class="sum-status-info">
+          <div class="sum-status-num sn-yellow">${esc(jmlLebih)}</div>
+          <div class="sum-status-label">Provinsi Melebihi Kuota</div>
+          <div class="sum-status-sub">Memiliki kelebihan di tiap unsur</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARIS 3: Detail Provinsi -->
+    <div class="sum-detail-grid">
+      <div class="sum-detail-card">
+        <div class="sum-detail-hdr dh-green">
+          <span>🟢</span>
+          <span class="sum-detail-hdr-title">Provinsi Sudah Sesuai (${esc(jmlSesuai)})</span>
+        </div>
+        <div class="sum-detail-body">${makeChips(namaSesuai,'chip-green')}</div>
+      </div>
+      <div class="sum-detail-card">
+        <div class="sum-detail-hdr dh-red">
+          <span>🔴</span>
+          <span class="sum-detail-hdr-title">Provinsi Masih Kurang (${esc(jmlKurang)})</span>
+        </div>
+        <div class="sum-detail-body">${makeChips(namaKurang,'chip-red')}</div>
+      </div>
+      <div class="sum-detail-card">
+        <div class="sum-detail-hdr dh-yellow">
+          <span>🟡</span>
+          <span class="sum-detail-hdr-title">Provinsi Melebihi Kuota (${esc(jmlLebih)})</span>
+        </div>
+        <div class="sum-detail-body">${makeChips(namaLebih,'chip-yellow')}</div>
+      </div>
+    </div>
+
+  </div>`;
+}
 
 // ════════════════════════════════════════
 //  DOWNLOAD PDF
