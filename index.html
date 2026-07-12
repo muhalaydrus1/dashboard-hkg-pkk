@@ -274,6 +274,61 @@
     .nb-yellow { background:#FEF3C7; color:#92400E; }
     .nb-black  { background:#1a1a1a; color:#ffffff; }
     .nb-ok     { background:#D1FAE5; color:#065F46; }
+
+    /* ══ PETA BUBBLE NASIONAL ══ */
+    .map-section {
+      background: var(--putih);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,121,107,.06);
+    }
+    .map-header {
+      padding: .85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,121,107,.02);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .map-title-row { display: flex; align-items: center; gap: .55rem; }
+    .map-title { font-size: .88rem; font-weight: 700; color: var(--g-tua); text-transform: uppercase; letter-spacing: .05em; }
+    .map-body {
+      position: relative;
+      width: 100%;
+      padding-bottom: 52%;
+      background: linear-gradient(160deg, #E0F7FA 0%, #E8F5E9 100%);
+      overflow: hidden;
+    }
+    .map-canvas {
+      position: absolute;
+      inset: 0; width: 100%; height: 100%;
+    }
+    /* Tooltip */
+    .map-tooltip {
+      position: fixed;
+      background: rgba(0,0,0,.85);
+      color: #fff;
+      padding: .45rem .75rem;
+      border-radius: 8px;
+      font-size: .75rem;
+      font-weight: 600;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+      max-width: 200px;
+      line-height: 1.5;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    }
+    .map-legend {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .65rem 1.25rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: rgba(0,121,107,.02);
+    }
+    .map-leg-lbl { font-size: .7rem; font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: .05em; }
+    .map-leg-item { display: flex; align-items: center; gap: .35rem; font-size: .72rem; font-weight: 500; color: var(--gelap); }
+    .map-leg-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .map-loading { padding: 3rem 2rem; text-align: center; color: var(--mid); font-size: .85rem; }
   </style>
 </head>
 <body>
@@ -326,6 +381,9 @@
     <button class="btn-ref" id="btnRef" onclick="fetchAll(true)">↻ Perbarui</button>
   </div>
 
+  <!-- TOOLTIP -->
+  <div class="map-tooltip" id="mapTooltip"></div>
+
   <!-- HOME -->
   <div class="page active" id="p-home">
     <div class="hero-summary">
@@ -335,6 +393,31 @@
       <div class="hero-pct-wrap">
         <span class="hero-pct-label">Persentase Realisasi</span>
         <span class="hero-pct-value" id="heroPct">···</span>
+      </div>
+    </div>
+
+    <!-- PETA BUBBLE -->
+    <div class="map-section">
+      <div class="map-header">
+        <div class="map-title-row">
+          <div class="card-pip"></div>
+          <span class="map-title">Peta Status Registrasi Per Provinsi</span>
+        </div>
+        <span style="font-size:.72rem;color:var(--mid);">Hover / tap provinsi untuk detail</span>
+      </div>
+      <div class="map-body">
+        <canvas class="map-canvas" id="mapCanvas"></canvas>
+        <div class="map-loading" id="mapLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;">
+          <div class="spinner"></div><p>Memuat peta…</p>
+        </div>
+      </div>
+      <div class="map-legend">
+        <span class="map-leg-lbl">Status:</span>
+        <span class="map-leg-item"><span class="map-leg-dot" style="background:#10B981"></span>Memenuhi kuota</span>
+        <span class="map-leg-item"><span class="map-leg-dot" style="background:#EF4444"></span>Kurang dari kuota</span>
+        <span class="map-leg-item"><span class="map-leg-dot" style="background:#F59E0B"></span>Melebihi kuota</span>
+        <span class="map-leg-item"><span class="map-leg-dot" style="background:#1a1a1a"></span>Tidak Hadir</span>
+        <span class="map-leg-item"><span class="map-leg-dot" style="background:#CBD5E1;border:1px solid #94A3B8"></span>Belum ada data</span>
       </div>
     </div>
   </div>
@@ -622,6 +705,288 @@ function emptyBox(){return`<div class="state-box"><p>Data kosong atau belum ters
 function errBox(msg){return`<div class="state-box err"><p>⚠ ${esc(msg)}</p></div>`;}
 
 
+
+// ════════════════════════════════════════
+//  PETA BUBBLE NASIONAL
+// ════════════════════════════════════════
+
+// Koordinat bubble (x%,y%) dalam canvas — posisi geografis relatif Indonesia
+// x=0 kiri(Sabang), x=100 kanan(Papua), y=0 atas(Aceh), y=100 bawah(NTT)
+const PROV_COORDS = [
+  // SUMATERA
+  {code:'ACEH',       name:'Aceh',              x:10.5, y:8.0,  r:1.4},
+  {code:'SUMUT',      name:'Sumatera Utara',    x:13.5, y:14.0, r:1.5},
+  {code:'SUMBAR',     name:'Sumatera Barat',    x:13.0, y:24.0, r:1.3},
+  {code:'RIAU',       name:'Riau',              x:18.5, y:22.0, r:1.3},
+  {code:'KEPRI',      name:'Kepulauan Riau',    x:21.0, y:27.5, r:1.1},
+  {code:'JAMBI',      name:'Jambi',             x:17.5, y:31.0, r:1.2},
+  {code:'BENGKULU',   name:'Bengkulu',          x:13.5, y:34.5, r:1.1},
+  {code:'SUMSEL',     name:'Sumatera Selatan',  x:18.5, y:38.5, r:1.4},
+  {code:'BABEL',      name:'Bangka Belitung',   x:22.5, y:36.5, r:1.0},
+  {code:'LAMPUNG',    name:'Lampung',           x:18.0, y:46.5, r:1.2},
+  // JAWA
+  {code:'BANTEN',     name:'Banten',            x:25.5, y:51.5, r:1.1},
+  {code:'JABAR',      name:'Jawa Barat',        x:29.0, y:53.5, r:1.5},
+  {code:'JAKARTA',    name:'DKI Jakarta',       x:27.5, y:50.5, r:0.9},
+  {code:'JATENG',     name:'Jawa Tengah',       x:33.0, y:54.5, r:1.4},
+  {code:'JOGJA',      name:'DI Yogyakarta',     x:33.5, y:57.5, r:0.9},
+  {code:'JATIM',      name:'Jawa Timur',        x:38.5, y:54.0, r:1.5},
+  {code:'BALI',       name:'Bali',              x:43.0, y:57.5, r:1.0},
+  // KALIMANTAN
+  {code:'KALBAR',     name:'Kalimantan Barat',  x:30.0, y:35.0, r:1.5},
+  {code:'KALTENG',    name:'Kalimantan Tengah', x:35.5, y:33.0, r:1.5},
+  {code:'KALSEL',     name:'Kalimantan Selatan',x:39.0, y:42.0, r:1.2},
+  {code:'KALTIM',     name:'Kalimantan Timur',  x:41.5, y:28.0, r:1.4},
+  {code:'KALTARA',    name:'Kalimantan Utara',  x:40.0, y:19.0, r:1.1},
+  // SULAWESI
+  {code:'SULUT',      name:'Sulawesi Utara',    x:51.5, y:16.0, r:1.1},
+  {code:'GORONTALO',  name:'Gorontalo',         x:50.0, y:21.5, r:1.0},
+  {code:'SULTENG',    name:'Sulawesi Tengah',   x:49.5, y:29.0, r:1.3},
+  {code:'SULBAR',     name:'Sulawesi Barat',    x:45.5, y:34.0, r:1.0},
+  {code:'SULSEL',     name:'Sulawesi Selatan',  x:47.5, y:41.5, r:1.4},
+  {code:'SULTRA',     name:'Sulawesi Tenggara', x:51.0, y:44.0, r:1.2},
+  // NUSA TENGGARA
+  {code:'NTB',        name:'NTB',               x:46.0, y:60.5, r:1.1},
+  {code:'NTT',        name:'NTT',               x:52.5, y:65.0, r:1.3},
+  // MALUKU
+  {code:'MALUKU',     name:'Maluku',            x:60.0, y:46.0, r:1.3},
+  {code:'MALUT',      name:'Maluku Utara',      x:58.0, y:28.0, r:1.1},
+  // PAPUA
+  {code:'PAPUABARAT', name:'Papua Barat',       x:68.5, y:38.5, r:1.2},
+  {code:'PBD',        name:'Papua Barat Daya',  x:65.0, y:47.0, r:1.1},
+  {code:'PAPTENG',    name:'Papua Tengah',      x:76.0, y:42.0, r:1.3},
+  {code:'PAPSEL',     name:'Papua Selatan',     x:78.5, y:54.0, r:1.2},
+  {code:'PAPUA',      name:'Papua',             x:84.0, y:36.0, r:1.5},
+  {code:'PEGUNUNGAN', name:'Papua Pegunungan',  x:81.0, y:44.0, r:1.2},
+];
+
+// Store status per provinsi dari data DASHBOARD B3:I42
+const PROV_STATUS = {};
+
+function updateProvStatus(rows) {
+  if (!rows || !rows.length) return;
+  const [head, ...body] = rows;
+  body.forEach(cells => {
+    const nama = (cells[0]||'').trim();
+    if (!nama) return;
+    const cProv  = cells[1]||''; // Provinsi orang
+    const cKab   = cells[2]||''; // KabKota aktual
+    const cOpd   = cells[3]||''; // OPD
+    const kuotaKab = toNum(cells[7]);
+
+    // Determine overall status for this provinsi
+    // Status = worst case across all unsur
+    let status = 'ok'; // green by default
+
+    // Check each unsur
+    const provNum = toNum(cProv);
+    const kabNum  = toNum(cKab);
+    const opdNum  = toNum(cOpd);
+
+    if (provNum !== null) {
+      if (provNum === 0) status = 'kurang';
+      else if (provNum < 7) { if (status === 'ok') status = 'kurang'; }
+      else if (provNum > 7) { if (status === 'ok') status = 'lebih'; }
+    }
+    if (kabNum !== null && kuotaKab !== null) {
+      if (kabNum === 0) status = 'kurang';
+      else if (kabNum < kuotaKab) { if (status !== 'kurang') status = 'kurang'; }
+      else if (kabNum > kuotaKab) { if (status === 'ok') status = 'lebih'; }
+    }
+    if (opdNum !== null) {
+      if (opdNum === 0) status = 'kurang';
+      else if (opdNum < 1) { if (status !== 'kurang') status = 'kurang'; }
+      else if (opdNum > 1) { if (status === 'ok') status = 'lebih'; }
+    }
+
+    // Map nama to code
+    const coord = PROV_COORDS.find(p => {
+      const n = nama.toLowerCase();
+      return n.includes(p.code.toLowerCase()) ||
+             p.name.toLowerCase().includes(n.split(' ')[0].toLowerCase()) ||
+             n.includes(p.name.toLowerCase().split(' ')[0]);
+    });
+    if (coord) {
+      PROV_STATUS[coord.code] = {
+        status,
+        peserta: cProv,
+        kabkota: cKab,
+        opd: cOpd,
+        nama: coord.name
+      };
+    }
+  });
+  drawMap();
+}
+
+function getBubbleColor(code) {
+  const s = PROV_STATUS[code];
+  if (!s) return '#CBD5E1'; // abu — belum ada data
+  if (s.status === 'tidak_hadir') return '#1a1a1a';
+  if (s.status === 'ok')     return '#10B981';
+  if (s.status === 'lebih')  return '#F59E0B';
+  if (s.status === 'kurang') return '#EF4444';
+  return '#CBD5E1';
+}
+
+function drawMap() {
+  const canvas = document.getElementById('mapCanvas');
+  const loading = document.getElementById('mapLoading');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth;
+  const H = canvas.offsetHeight;
+  canvas.width = W;
+  canvas.height = H;
+
+  // Background
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw subtle grid lines for geographic reference
+  ctx.strokeStyle = 'rgba(0,121,107,0.06)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= W; x += W/10) {
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+  }
+  for (let y = 0; y <= H; y += H/8) {
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  // Draw connection lines (archipelago feel)
+  ctx.strokeStyle = 'rgba(0,121,107,0.08)';
+  ctx.lineWidth = 1;
+  const groups = [
+    ['ACEH','SUMUT','SUMBAR','RIAU','JAMBI','SUMSEL','BENGKULU','LAMPUNG','BABEL','KEPRI'],
+    ['BANTEN','JAKARTA','JABAR','JATENG','JOGJA','JATIM','BALI'],
+    ['KALBAR','KALTENG','KALSEL','KALTIM','KALTARA'],
+    ['SULUT','GORONTALO','SULTENG','SULBAR','SULSEL','SULTRA'],
+    ['NTB','NTT'],
+    ['MALUT','MALUKU'],
+    ['PAPUABARAT','PBD','PAPTENG','PAPSEL','PAPUA','PEGUNUNGAN'],
+  ];
+
+  groups.forEach(group => {
+    const pts = group.map(code => PROV_COORDS.find(p=>p.code===code)).filter(Boolean);
+    if (pts.length < 2) return;
+    ctx.beginPath();
+    pts.forEach((p,i) => {
+      const px = (p.x/100)*W, py = (p.y/100)*H;
+      i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+  });
+
+  // Draw bubbles
+  PROV_COORDS.forEach(prov => {
+    const px = (prov.x/100)*W;
+    const py = (prov.y/100)*H;
+    const radius = (prov.r/100) * Math.min(W,H) * 2.2;
+    const color = getBubbleColor(prov.code);
+
+    // Shadow
+    ctx.shadowColor = 'rgba(0,0,0,0.15)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
+
+    // Circle fill
+    ctx.beginPath();
+    ctx.arc(px, py, radius, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // Border
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Label (only on larger screens)
+    if (W > 600) {
+      const shortName = prov.code.length <= 6 ? prov.code :
+        prov.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,4);
+      ctx.fillStyle = color === '#1a1a1a' ? '#fff' :
+        (color === '#CBD5E1' ? '#64748B' : '#fff');
+      ctx.font = `bold ${Math.max(7, radius*0.55)}px Plus Jakarta Sans, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(shortName, px, py);
+    }
+  });
+
+  // Hide loading
+  if (loading) loading.style.display = 'none';
+}
+
+// Tooltip interaction
+function setupMapInteraction() {
+  const canvas = document.getElementById('mapCanvas');
+  const tooltip = document.getElementById('mapTooltip');
+  if (!canvas || !tooltip) return;
+
+  function getHoveredProv(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const W = rect.width, H = rect.height;
+    const mx = clientX - rect.left;
+    const my = clientY - rect.top;
+
+    for (const prov of PROV_COORDS) {
+      const px = (prov.x/100)*W;
+      const py = (prov.y/100)*H;
+      const radius = (prov.r/100) * Math.min(W,H) * 2.2 + 4; // +4 hit area
+      const dist = Math.sqrt((mx-px)**2 + (my-py)**2);
+      if (dist <= radius) return prov;
+    }
+    return null;
+  }
+
+  function showTooltip(prov, clientX, clientY) {
+    const s = PROV_STATUS[prov.code];
+    const statusLabel = !s ? 'Belum ada data' :
+      s.status==='ok' ? '✅ Memenuhi Kuota' :
+      s.status==='lebih' ? '🟡 Melebihi Kuota' :
+      s.status==='tidak_hadir' ? '⬛ Tidak Hadir' :
+      '🔴 Masih Kurang';
+    const detail = s ? `Provinsi: ${s.peserta||'–'} | Kab/Kota: ${s.kabkota||'–'} | OPD: ${s.opd||'–'}` : '';
+    tooltip.innerHTML = `<strong>${prov.name}</strong><br>${statusLabel}${detail ? '<br><span style="opacity:.8;font-size:.68rem">'+detail+'</span>' : ''}`;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (clientX + 12) + 'px';
+    tooltip.style.top  = (clientY - 10) + 'px';
+    canvas.style.cursor = 'pointer';
+  }
+
+  function hideTooltip() {
+    tooltip.style.display = 'none';
+    canvas.style.cursor = 'default';
+  }
+
+  // Mouse
+  canvas.addEventListener('mousemove', e => {
+    const prov = getHoveredProv(e.clientX, e.clientY);
+    prov ? showTooltip(prov, e.clientX, e.clientY) : hideTooltip();
+  });
+  canvas.addEventListener('mouseleave', hideTooltip);
+
+  // Touch
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    const prov = getHoveredProv(t.clientX, t.clientY);
+    prov ? showTooltip(prov, t.clientX, t.clientY) : hideTooltip();
+  }, {passive:false});
+  canvas.addEventListener('touchend', () => setTimeout(hideTooltip, 2000));
+
+  // Redraw on resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(drawMap, 200);
+  });
+}
+
+// Init map
+setupMapInteraction();
 // ════════════════════════════════════════
 //  SIDEBAR BADGES
 // ════════════════════════════════════════
@@ -715,6 +1080,10 @@ async function fetchSection(s){
       document.getElementById('sum-dashboard').innerHTML=doRender(rows,s.render);
     }else{
       el.innerHTML=doRender(rows,s.render);
+      // Update peta bubble from nasional data
+      if(s.id==='tbl-nasional') {
+        updateProvStatus(rows);
+      }
       // Compute sidebar badge for wilayah sections
       if(s.render==='rekap' && WILAYAH_BADGE_MAP[s.id]) {
         computeBadge(rows, WILAYAH_BADGE_MAP[s.id]);
