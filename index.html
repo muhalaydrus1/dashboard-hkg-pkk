@@ -765,57 +765,135 @@ const PROV_STATUS = {};
 
 function updateProvStatus(rows) {
   if (!rows || !rows.length) return;
+
+  // Direct mapping: nama di Sheet (kolom B, baris data) -> kode bubble
+  // Urutan sesuai sheet DASHBOARD B3:I42
+  const NAME_TO_CODE = {
+    'aceh': 'ACEH',
+    'sumatera utara': 'SUMUT',
+    'sumut': 'SUMUT',
+    'sumatera barat': 'SUMBAR',
+    'sumbar': 'SUMBAR',
+    'sumatera selatan': 'SUMSEL',
+    'sumsel': 'SUMSEL',
+    'riau': 'RIAU',
+    'kepulauan riau': 'KEPRI',
+    'kepri': 'KEPRI',
+    'jambi': 'JAMBI',
+    'bengkulu': 'BENGKULU',
+    'bangka belitung': 'BABEL',
+    'babel': 'BABEL',
+    'lampung': 'LAMPUNG',
+    'kalimantan barat': 'KALBAR',
+    'kalbar': 'KALBAR',
+    'kalimantan selatan': 'KALSEL',
+    'kalsel': 'KALSEL',
+    'kalimantan timur': 'KALTIM',
+    'kaltim': 'KALTIM',
+    'kalimantan utara': 'KALTARA',
+    'kaltara': 'KALTARA',
+    'kalimantan tengah': 'KALTENG',
+    'kalteng': 'KALTENG',
+    'jawa timur': 'JATIM',
+    'jatim': 'JATIM',
+    'banten': 'BANTEN',
+    'jawa barat': 'JABAR',
+    'jabar': 'JABAR',
+    'jawa tengah': 'JATENG',
+    'jateng': 'JATENG',
+    'dki jakarta': 'JAKARTA',
+    'jakarta': 'JAKARTA',
+    'di yogyakarta': 'JOGJA',
+    'yogyakarta': 'JOGJA',
+    'jogja': 'JOGJA',
+    'bali': 'BALI',
+    'gorontalo': 'GORONTALO',
+    'sulawesi tenggara': 'SULTRA',
+    'sultra': 'SULTRA',
+    'sulawesi selatan': 'SULSEL',
+    'sulsel': 'SULSEL',
+    'sulawesi utara': 'SULUT',
+    'sulut': 'SULUT',
+    'sulawesi barat': 'SULBAR',
+    'sulbar': 'SULBAR',
+    'sulawesi tengah': 'SULTENG',
+    'sulteng': 'SULTENG',
+    'nusa tenggara barat': 'NTB',
+    'ntb': 'NTB',
+    'nusa tenggara timur': 'NTT',
+    'ntt': 'NTT',
+    'maluku': 'MALUKU',
+    'maluku utara': 'MALUT',
+    'malut': 'MALUT',
+    'papua': 'PAPUA',
+    'papua barat daya': 'PBD',
+    'pbd': 'PBD',
+    'papua barat': 'PAPUABARAT',
+    'papua tengah': 'PAPTENG',
+    'papteng': 'PAPTENG',
+    'papua selatan': 'PAPSEL',
+    'papsel': 'PAPSEL',
+    'papua pegunungan': 'PEGUNUNGAN',
+    'pegunungan': 'PEGUNUNGAN',
+  };
+
   const [head, ...body] = rows;
   body.forEach(cells => {
-    const nama = (cells[0]||'').trim();
+    const nama = (cells[0]||'').trim().toLowerCase();
     if (!nama) return;
-    const cProv  = cells[1]||''; // Provinsi orang
-    const cKab   = cells[2]||''; // KabKota aktual
-    const cOpd   = cells[3]||''; // OPD
+
+    // Skip baris header/total
+    if (/^(no|provinsi|total|jumlah|grand)/i.test(nama)) return;
+
+    // Cari kode dari nama
+    let code = null;
+    // Exact match dulu
+    if (NAME_TO_CODE[nama]) {
+      code = NAME_TO_CODE[nama];
+    } else {
+      // Partial match — cari yang paling cocok
+      for (const [key, val] of Object.entries(NAME_TO_CODE)) {
+        if (nama.includes(key) || key.includes(nama)) {
+          code = val; break;
+        }
+      }
+    }
+    if (!code) return;
+
+    const cProv    = (cells[1]||'').trim();
+    const cKab     = (cells[2]||'').trim();
+    const cOpd     = (cells[3]||'').trim();
     const kuotaKab = toNum(cells[7]);
+    const provNum  = toNum(cProv);
+    const kabNum   = toNum(cKab);
+    const opdNum   = toNum(cOpd);
 
-    // Determine overall status for this provinsi
-    // Status = worst case across all unsur
-    let status = 'ok'; // green by default
-
-    // Check each unsur
-    const provNum = toNum(cProv);
-    const kabNum  = toNum(cKab);
-    const opdNum  = toNum(cOpd);
+    // Determine status — worst case across all unsur
+    // Priority: kurang > lebih > ok
+    let status = 'ok';
 
     if (provNum !== null) {
-      if (provNum === 0) status = 'kurang';
-      else if (provNum < 7) { if (status === 'ok') status = 'kurang'; }
-      else if (provNum > 7) { if (status === 'ok') status = 'lebih'; }
+      if (provNum < 7)       status = 'kurang';
+      else if (provNum > 7)  status = 'lebih';
     }
     if (kabNum !== null && kuotaKab !== null) {
-      if (kabNum === 0) status = 'kurang';
-      else if (kabNum < kuotaKab) { if (status !== 'kurang') status = 'kurang'; }
+      if (kabNum < kuotaKab)      { if (status !== 'kurang') status = 'kurang'; }
       else if (kabNum > kuotaKab) { if (status === 'ok') status = 'lebih'; }
     }
     if (opdNum !== null) {
-      if (opdNum === 0) status = 'kurang';
-      else if (opdNum < 1) { if (status !== 'kurang') status = 'kurang'; }
+      if (opdNum < 1)      { if (status !== 'kurang') status = 'kurang'; }
       else if (opdNum > 1) { if (status === 'ok') status = 'lebih'; }
     }
 
-    // Map nama to code
-    const coord = PROV_COORDS.find(p => {
-      const n = nama.toLowerCase();
-      return n.includes(p.code.toLowerCase()) ||
-             p.name.toLowerCase().includes(n.split(' ')[0].toLowerCase()) ||
-             n.includes(p.name.toLowerCase().split(' ')[0]);
-    });
-    if (coord) {
-      PROV_STATUS[coord.code] = {
-        status,
-        peserta: cProv,
-        kabkota: cKab,
-        opd: cOpd,
-        nama: coord.name
-      };
-    }
+    PROV_STATUS[code] = {
+      status,
+      peserta: cProv,
+      kabkota: cKab,
+      opd: cOpd,
+      nama: PROV_COORDS.find(p=>p.code===code)?.name || nama
+    };
   });
+
   drawMap();
 }
 
